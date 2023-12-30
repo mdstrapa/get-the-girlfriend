@@ -30,7 +30,7 @@ int setGirlfriendXPos(){
 }
 
 int setGirVelocity(){
-    return generateRandomValue(2,5);
+    return generateRandomValue(2,4);
 }
 
 int setGirlOfTheTurn(){
@@ -70,8 +70,8 @@ int main(){
     int playerPontuation{0};
     bool shouldIncreasePontuation{true};
     bool shouldDecreasePontuation{true};
-    bool lostKiss{};
-    bool kissed{};
+    bool didntGetGirl{};
+    bool gotGirl{};
 
     int background1YPos{0};
     int background2YPos{-backgroundText.height};
@@ -80,6 +80,8 @@ int main(){
     float girlfriendScale{1.0};
     bool shouldChangeScale{};
     float floatTolerance = 0.0001;
+
+    std::string intruction;
 
     SetTargetFPS(60);
     while(!WindowShouldClose()){
@@ -91,11 +93,27 @@ int main(){
         background1YPos++;
         background2YPos++;
 
+        DrawRectangle(0,0,800,35,WHITE);
+
         if(background1YPos == windowSize.y) background1YPos = -backgroundText.height;
         if(background2YPos == windowSize.y) background2YPos = -backgroundText.height;
 
-
-        DrawText("Get The Girlfriend",0,0,30,RED);
+        switch (girls[girlOfTheTurn].type)
+        {
+            case GIRLFRIEND:
+            intruction = "Pegue sua menina!!";
+            break;
+            case WRONGGIRL:
+            intruction = "Fuja dela!!";
+            break;
+            case ALTERNATIVEGIRL:
+            intruction = "Você que decide o que fazer....";
+            break;
+        
+        default:
+            break;
+        }
+        DrawText(intruction.c_str(),0,5,30,RED);
         
         girlfriendPos.y = girlfriendPos.y + girlfriendVel;
 
@@ -106,14 +124,15 @@ int main(){
             shouldIncreasePontuation = true;
             shouldDecreasePontuation = true;
             girlfriendVel = setGirVelocity();
-            kissed = false;
-            lostKiss = false;
+            gotGirl = false;
+            didntGetGirl = false;
             girlfriendColor = WHITE;
             girlOfTheTurn = setGirlOfTheTurn();
+            girlfriendScale = 1.0;
         }
 
-        if(IsKeyPressed(KEY_LEFT)) boyfriendXPos = boyfriendXPos - 10;
-        if(IsKeyPressed(KEY_RIGHT)) boyfriendXPos = boyfriendXPos + 10;
+        if(IsKeyPressed(KEY_LEFT)) boyfriendXPos = boyfriendXPos - 15;
+        if(IsKeyPressed(KEY_RIGHT)) boyfriendXPos = boyfriendXPos + 15;
 
         Rectangle recBoyfriend{};
         recBoyfriend.x = boyfriendXPos;
@@ -128,29 +147,47 @@ int main(){
         recGirlfriend.height = girlfriendTex.height;
 
         if (CheckCollisionRecs(recBoyfriend,recGirlfriend)){ 
-            if(!lostKiss){
-                DrawText("Kissed!!!",windowSize.x / 2 - 20,windowSize.y / 2 - 40,40,BLUE);
+            if(girls[girlOfTheTurn].type == GIRLFRIEND || girls[girlOfTheTurn].type == ALTERNATIVEGIRL){
+                DrawText("Bom trabalho!!!",windowSize.x / 2 - 50,windowSize.y / 2 - 15,30,BLUE);
                 if (shouldIncreasePontuation){
                     playerPontuation = playerPontuation + 10;
                     shouldIncreasePontuation = false;
-                    kissed = true;
+                    gotGirl = true;
+                    girlfriendColor = BLUE;
+                }
+            }else{
+                DrawText("Não pode pegar essa menina!!",windowSize.x / 2 - 70,windowSize.y / 2 - 15,30,RED);
+                if(shouldDecreasePontuation){
+                    playerPontuation = playerPontuation - 5;
+                    didntGetGirl = true;
+                    shouldDecreasePontuation = false;
+                    girlfriendColor = RED;
+                }
+            }
+        }
+
+        if((girlfriendPos.y + girlfriendTex.height >= windowSize.y) && !gotGirl){
+            if(girls[girlOfTheTurn].type == GIRLFRIEND || girls[girlOfTheTurn].type == ALTERNATIVEGIRL){
+                DrawText("Perdeu sua menina!",windowSize.x / 2 - 40,windowSize.y / 2 - 15,30,RED);
+                if(shouldDecreasePontuation){
+                    playerPontuation = playerPontuation - 5;
+                    didntGetGirl = true;
+                    shouldDecreasePontuation = false;
+                    girlfriendColor = RED;
+                }
+            }else{
+                DrawText("Bom trabalho!!",windowSize.x / 2 - 40,windowSize.y / 2 - 15,30,BLUE);
+                if (shouldIncreasePontuation){
+                    playerPontuation = playerPontuation + 10;
+                    shouldIncreasePontuation = false;
+                    gotGirl = false;
                     girlfriendColor = BLUE;
                 }
             }
         }
 
-        if((girlfriendPos.y + girlfriendTex.height >= windowSize.y) && !kissed){
-            DrawText("Lost....",windowSize.x / 2 - 20,windowSize.y / 2 - 40,40,RED);
-            if(shouldDecreasePontuation){
-                playerPontuation = playerPontuation - 5;
-                lostKiss = true;
-                shouldDecreasePontuation = false;
-                girlfriendColor = RED;
-            }
-        }
 
-
-        if(kissed) {
+        if(gotGirl) {
                 if(focusControl % 5 == 0) shouldChangeScale = true;
                 focusControl++;
 
@@ -163,8 +200,8 @@ int main(){
 
                 DrawTextureEx(girls[girlOfTheTurn].image,girlfriendPos,0.0,girlfriendScale,girlfriendColor);
             }
-        else if (lostKiss) {
-                if(focusControl % 5 == 0) shouldChangeScale = true;
+        else if (didntGetGirl) {
+                /*if(focusControl % 5 == 0) shouldChangeScale = true;
                 focusControl++;
 
                 if(shouldChangeScale){
@@ -174,6 +211,7 @@ int main(){
                     else girlfriendScale = 0.8;
                 }
 
+*/
                 DrawTextureEx(girls[girlOfTheTurn].image,girlfriendPos,0.0,girlfriendScale,girlfriendColor);
             }
         else DrawTexture(girls[girlOfTheTurn].image,girlfriendPos.x,girlfriendPos.y,girlfriendColor);
@@ -181,9 +219,9 @@ int main(){
         DrawTexture(boyfriendTex,boyfriendXPos,windowSize.y - boyfriendTex.height,WHITE);
         
         std::string textToDraw = std::to_string(playerPontuation);
-        std::string pontuationText = "Pontuation: ";
+        std::string pontuationText = "Pontuação: ";
         pontuationText.append(textToDraw);
-        DrawText(pontuationText.c_str(),0,100,30,GREEN);
+        DrawText(pontuationText.c_str(),550,5,30,GREEN);
 
         EndDrawing();
     }
