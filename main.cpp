@@ -148,7 +148,7 @@ int main(){
 
         if (CheckCollisionRecs(recBoyfriend,recGirlfriend)){ 
             if(girls[girlOfTheTurn].type == GIRLFRIEND || girls[girlOfTheTurn].type == ALTERNATIVEGIRL){
-                DrawText("Bom trabalho!!!",windowSize.x / 2 - 50,windowSize.y / 2 - 15,30,BLUE);
+                DrawText("Bom trabalho!!!",windowSize.x / 2 - 100,windowSize.y / 2 - 15,30,BLUE);
                 if (shouldIncreasePontuation){
                     playerPontuation = playerPontuation + 10;
                     shouldIncreasePontuation = false;
@@ -156,10 +156,11 @@ int main(){
                     girlfriendColor = BLUE;
                 }
             }else{
-                DrawText("Não pode pegar essa menina!!",windowSize.x / 2 - 70,windowSize.y / 2 - 15,30,RED);
+                DrawText("Não pode pegar essa menina!!",windowSize.x / 2 - 200,windowSize.y / 2 - 15,30,RED);
                 if(shouldDecreasePontuation){
                     playerPontuation = playerPontuation - 5;
                     didntGetGirl = true;
+                    gotGirl = true;
                     shouldDecreasePontuation = false;
                     girlfriendColor = RED;
                 }
@@ -168,7 +169,7 @@ int main(){
 
         if((girlfriendPos.y + girlfriendTex.height >= windowSize.y) && !gotGirl){
             if(girls[girlOfTheTurn].type == GIRLFRIEND || girls[girlOfTheTurn].type == ALTERNATIVEGIRL){
-                DrawText("Perdeu sua menina!",windowSize.x / 2 - 40,windowSize.y / 2 - 15,30,RED);
+                DrawText("Perdeu sua menina!",windowSize.x / 2 - 150,windowSize.y / 2 - 15,30,RED);
                 if(shouldDecreasePontuation){
                     playerPontuation = playerPontuation - 5;
                     didntGetGirl = true;
@@ -176,7 +177,7 @@ int main(){
                     girlfriendColor = RED;
                 }
             }else{
-                DrawText("Bom trabalho!!",windowSize.x / 2 - 40,windowSize.y / 2 - 15,30,BLUE);
+                DrawText("Bom trabalho!!",windowSize.x / 2 - 100,windowSize.y / 2 - 15,30,BLUE);
                 if (shouldIncreasePontuation){
                     playerPontuation = playerPontuation + 10;
                     shouldIncreasePontuation = false;
@@ -200,20 +201,7 @@ int main(){
 
                 DrawTextureEx(girls[girlOfTheTurn].image,girlfriendPos,0.0,girlfriendScale,girlfriendColor);
             }
-        else if (didntGetGirl) {
-                /*if(focusControl % 5 == 0) shouldChangeScale = true;
-                focusControl++;
-
-                if(shouldChangeScale){
-                    shouldChangeScale = false;
-                    
-                    if(std::abs(girlfriendScale - 0.8) < floatTolerance) girlfriendScale = 1.0;
-                    else girlfriendScale = 0.8;
-                }
-
-*/
-                DrawTextureEx(girls[girlOfTheTurn].image,girlfriendPos,0.0,girlfriendScale,girlfriendColor);
-            }
+        else if (didntGetGirl) DrawTextureEx(girls[girlOfTheTurn].image,girlfriendPos,0.0,girlfriendScale,girlfriendColor);
         else DrawTexture(girls[girlOfTheTurn].image,girlfriendPos.x,girlfriendPos.y,girlfriendColor);
 
         DrawTexture(boyfriendTex,boyfriendXPos,windowSize.y - boyfriendTex.height,WHITE);
